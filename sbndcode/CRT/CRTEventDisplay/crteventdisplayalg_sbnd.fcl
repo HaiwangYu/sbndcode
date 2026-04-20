@@ -1,4 +1,3 @@
-#include "crtgeoalg_sbnd.fcl"
 #include "crtbacktrackeralg_sbnd.fcl"
 #include "crtsimmodules_sbnd.fcl"
 
@@ -6,7 +5,6 @@ BEGIN_PROLOG
 
 crteventdisplayalg_sbnd:
 {
-   CRTGeoAlg:         @local::crtgeoalg_sbnd
    CRTBackTrackerAlg: @local::crtbacktrackeralg_sbnd
 
    MC: true
@@ -20,6 +18,7 @@ crteventdisplayalg_sbnd:
    TPCSpacePointMatchLabel: "crtspacepointmatching"
    TPCTrackMatchLabel:      "crttrackmatching"
    TPCTrackLabel:           "pandoraTrack"
+   PFPLabel:                "pandora"
 
    SaveRoot:         true
    SaveViews:        false
@@ -39,6 +38,7 @@ crteventdisplayalg_sbnd:
    DrawTPCMatching:   false
    OnlyDrawMatched:   false
    DisplayMatchScore: false
+   DrawTPCTracks:     false
 
    ## If chose taggers is set to true then the vector ChosenTaggers
    ## is used to determine which taggers are drawn. The integer values
@@ -96,5 +96,29 @@ crteventdisplayalg_sbnd_data.ChoseTaggers:    false
 crteventdisplayalg_sbnd_data.UseTs0:          true
 crteventdisplayalg_sbnd_data.MinTime:         -1.5e6
 crteventdisplayalg_sbnd_data.MaxTime:         1.5e6
+
+crteventdisplayalg_sbnd_channel_mapping: @local::crteventdisplayalg_sbnd
+
+crteventdisplayalg_sbnd_channel_mapping.MC:               false
+crteventdisplayalg_sbnd_channel_mapping.SaveRoot:         false
+crteventdisplayalg_sbnd_channel_mapping.SaveViews:        true
+
+crteventdisplayalg_sbnd_channel_mapping.ChoseTaggers:     true
+crteventdisplayalg_sbnd_channel_mapping.HighlightModules: true
+
+crteventdisplayalg_sbnd_channel_mapping.DrawTaggers:      true
+crteventdisplayalg_sbnd_channel_mapping.DrawModules:      true
+crteventdisplayalg_sbnd_channel_mapping.DrawFEBs:         true
+crteventdisplayalg_sbnd_channel_mapping.DrawFEBEnds:      true
+crteventdisplayalg_sbnd_channel_mapping.DrawStrips:       false
+crteventdisplayalg_sbnd_channel_mapping.DrawTPC:          true
+crteventdisplayalg_sbnd_channel_mapping.DrawTrueTracks:   false
+crteventdisplayalg_sbnd_channel_mapping.DrawSimDeposits:  false
+crteventdisplayalg_sbnd_channel_mapping.DrawStripHits:    false
+crteventdisplayalg_sbnd_channel_mapping.DrawClusters:     false
+crteventdisplayalg_sbnd_channel_mapping.DrawSpacePoints:  false
+crteventdisplayalg_sbnd_channel_mapping.DrawTracks:       false
+
+crteventdisplayalg_sbnd_channel_mapping.Print:            false
 
 END_PROLOG
