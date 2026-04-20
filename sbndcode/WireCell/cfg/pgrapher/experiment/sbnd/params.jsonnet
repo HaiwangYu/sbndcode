@@ -86,7 +86,7 @@ base {
     },
 
     daq: super.daq {
-        nticks: 3427,
+        nticks: 3400,
     },
 
     nf: super.nf { 
@@ -145,7 +145,7 @@ base {
     },
 
     files: {
-        wires: "sbnd-wires-geometry-v0206.json.bz2", // new SBND geometry
+        wires: "sbnd-wires-geometry-v0200.json.bz2", // new SBND geometry
 
         fields: [ "garfield-sbnd-v1.json.bz2" ],
 

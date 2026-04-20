@@ -51,7 +51,7 @@ function(params)
     },
 
     perchanresp : {
-        type: "ParamsPerChannelResponse",
+        type: "PerChannelResponse",
         data: {
             filename: params.files.chresp,
         }
@@ -64,7 +64,7 @@ function(params)
     // g.uses() convert [null] into [].
     perchanresp_nameuses : if std.type(params.files.chresp) == 'null'
     then {name:"", uses:[]}
-    else {name:wc.tn($.perchanresp), uses:[$.perchanresp]},
+    else {name:wc.tn(self.perchanresp), uses:[self.perchanresp]},
 
 
     wires : {

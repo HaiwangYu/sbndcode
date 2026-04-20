@@ -73,7 +73,7 @@ local wc = import "wirecell.jsonnet";
         // as "nticks".  For example, NF will typicall differ.  Also,
         // in general this is not the number used for the Ductor for
         // simulation.
-        nticks: 3415,
+        nticks: 10000,
 
         // Readout period in units of time
         readout_time: self.tick*self.nticks,
@@ -155,11 +155,6 @@ local wc = import "wirecell.jsonnet";
 
     // Parameters related to simulation, not given elsewhere.
     sim : {
-
-        // The "absolute" time (ie, relative to trigger time?) that the lower edge
-        // of final readout tick #0 should correspond to.  This is a
-        // "fixed" notion.
-        tick0_time: 0,
 
         // The number of impact bins per wire region gives the
         // granularity of the simulation convolution in the transverse

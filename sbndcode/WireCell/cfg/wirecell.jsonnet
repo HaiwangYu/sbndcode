@@ -324,16 +324,41 @@
                then obj.type + ":" + obj.name
                else obj.type,
 
+    // The "plural" version of tn().  Return an array of type/names given an
+    // array of objects.  This is simply a list comprehension to save a little
+    // typing.
+    tns(objs) :: [$.tn(obj) for obj in objs],
+
 
     // Return a new list where only the first occurrence of any object is kept.
     unique_helper(l, x):: if std.count(l,x) == 0 then l + [x] else l,
     unique_list(l):: std.foldl($.unique_helper, l, []),
 
 
+    // Return an array.  If l is array, return it.  If string, split it, if object return field names
+    listify(l, d=',') ::
+        local t = std.type(l);
+        if t == "string" then
+            std.split(l, d)
+        else if t == "object" then
+            std.objectValues(l)
+        else
+            l,
+
     // Round a floating point to nearest integer.  It's a bit weird to
     // go through a format/parse.  Maybe there's a better way?
     roundToInt(x):: std.parseInt("%d" % (x+0.5)),
 
+    // Like the shell command of the same name.  
+    basename(name, ext="",  delim="/") ::
+        local parts = std.split(name, delim);
+        local base = parts[std.length(parts)-1];
+        if std.endsWith(base, ext) then
+            base[:std.length(base)-std.length(ext)]
+        else
+            base, 
+
+    
     freqbinner :: function(tick, nsamples) {
         nyquist : 0.5 / tick,
         hz_perbin : 1.0/(tick/$.second * nsamples),
@@ -367,6 +392,11 @@
         testmasks : self.freqmasks(self.testfreqs, 2*$.kilohertz),
         
     },
+
+
+    // This is std.get from 0.18.0
+    get(o, f, default=null, inc_hidden=true)::
+        if std.objectHasEx(o, f, inc_hidden) then o[f] else default,
 
 }
 
