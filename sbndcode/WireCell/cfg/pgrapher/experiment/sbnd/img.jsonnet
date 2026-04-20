@@ -142,7 +142,7 @@ local img = {
                 error_tag: "gauss_error%d" % anode.data.ident,
                 anode: wc.tn(anode),
                 min_tbin: 0,
-                max_tbin: 3400, //we used 0 previously. changed to 3400 to check Ewerton 2023-10-25 (original=8500 PD?)
+                max_tbin: params.daq.nticks, //we used 0 previously. changed to 3400 to check Ewerton 2023-10-25 (original=8500 PD?)
                 active_planes: active_planes,
                 masked_planes: masked_planes,
                 dummy_planes: dummy_planes,
