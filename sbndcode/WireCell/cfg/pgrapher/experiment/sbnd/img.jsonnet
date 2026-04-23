@@ -13,7 +13,7 @@ local anode_iota = std.range(0, nanodes - 1);
 
 local img = {
     // IFrame -> IFrame
-    pre_proc :: function(anode, aname = "") {
+    pre_proc :: function(anode, aname = "", channels_per_apa = 5638) {
 
     local waveform_map = {
         type: 'WaveformMap',
@@ -44,7 +44,7 @@ local img = {
         //name: 'chsel%d' % n,
         name: 'chsel%d' % anode.data.ident,
         data: {
-          channels: std.range(5632 * anode.data.ident, 5632 * (anode.data.ident + 1) - 1),
+          channels: std.range(channels_per_apa * anode.data.ident, channels_per_apa * (anode.data.ident + 1) - 1),
           //tags: ['orig%d' % n], // traces tag //commented? Ewerton 2023-09-xx
           tags: ['gauss%d' % anode.data.ident, 'wiener%d' % anode.data.ident], // changed Ewerton 2023-09-27
         },
@@ -358,8 +358,8 @@ function() {
     }.ret,
 
 
-    per_anode(anode, multi_slicing = "single", add_dump = true) :: g.pipeline([
-        img.pre_proc(anode, anode.name),
+    per_anode(anode, multi_slicing = "single", add_dump = true, channels_per_apa = 5638) :: g.pipeline([
+        img.pre_proc(anode, anode.name, channels_per_apa),
         imgpipe(anode, multi_slicing, add_dump),
         ], "per_anode"),
 }
