@@ -369,7 +369,8 @@ function() {
             ] + if add_dump then [
             img.dump(anode, anode.name+"-ms-masked", params.lar.drift_speed),] else []),
         ret: g.fan.fanout("FrameFanout",[active_fork,masked_fork], "fan_active_masked-%s"%anode.name),
-    }.ret,
+    }.ret
+    else error "unsupported multi_slicing: " + multi_slicing,
 
 
     per_anode(anode, multi_slicing = "single", add_dump = true, channels_per_apa = 5638) :: g.pipeline([
