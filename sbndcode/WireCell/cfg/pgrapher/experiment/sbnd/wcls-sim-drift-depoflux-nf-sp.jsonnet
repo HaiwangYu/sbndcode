@@ -135,7 +135,7 @@ local wcls_depoflux_writer = g.pnode({
 
     //energy: 1, # equivalent to use_energy = true
     simchan_label: 'simpleSC',
-    sed_label: if (savetid == 'true') then 'ionandscint' else '',
+    sed_label: if (savetid == 'true') then std.extVar('inputTag') else '',
     sparse: false,
   },
 }, nin=1, nout=1, uses=tools.anodes + [tools.field]);
@@ -202,6 +202,7 @@ local nf_pipes = [nf_maker(params, tools.anodes[n], chndb[n], n, name='nf%d' % n
 local multipass1 = [
   g.pipeline([
                sn_pipes[n],
+               // sinks.orig_pipe[n],
              ],
              'multipass%d' % n)
   for n in anode_iota
@@ -336,7 +337,11 @@ local ts_p1 = {
     },
 };
 
-local dnnroi_pipes = [ dnnroi(tools.anodes[n], ts_p0, ts_p1, output_scale=1, nchunks=nchunks) for n in std.range(0, std.length(tools.anodes) - 1) ];
+local dnnroi_pipes = [
+    g.pipeline([
+        dnnroi(tools.anodes[n], ts_p0, ts_p1, output_scale=1, nchunks=nchunks),
+        // sinks.dnnroi_pipe[n],
+        ], 'dnnroi_sink_pipe_%d' % n) for n in std.range(0, std.length(tools.anodes) - 1) ];
 
 local fanout = function (name, multiplicity=2)
   g.pnode({
@@ -362,6 +367,17 @@ local chsel_pipes = [
   for n in anode_iota
 ];
 
+local nf_sp_pipes = [
+  g.pipeline([
+                nf_pipes[n],
+                // sinks.raw_pipe[n], 
+                sp_pipes[n],
+                // sinks.decon_pipe[n],
+                // sinks.debug_pipe[n],
+             ],
+             'nf_sp_pipe_%d' % n)
+  for n in anode_iota
+];
 
 local nfsp_pipes = 
 if roi == "dnn" then
@@ -370,11 +386,10 @@ if roi == "dnn" then
   g.intern(
     innodes=[chsel_pipes[n]],
     outnodes=[dnnroi_pipes[n],sp_fans[n]],
-    centernodes=[nf_pipes[n], sp_pipes[n], sp_fans[n]],
+    centernodes=[nf_sp_pipes[n], sp_fans[n]],
     edges=[
-      g.edge(chsel_pipes[n], nf_pipes[n], 0, 0),
-      g.edge(nf_pipes[n], sp_pipes[n], 0, 0),
-      g.edge(sp_pipes[n], sp_fans[n], 0, 0),
+      g.edge(chsel_pipes[n], nf_sp_pipes[n], 0, 0),
+      g.edge(nf_sp_pipes[n], sp_fans[n], 0, 0),
       g.edge(sp_fans[n], dnnroi_pipes[n], 0, 0),
     ],
     iports=chsel_pipes[n].iports,
@@ -389,11 +404,10 @@ else if roi == "both" then
   g.intern(
     innodes=[chsel_pipes[n]],
     outnodes=[dnnroi_pipes[n],sp_fans[n]],
-    centernodes=[nf_pipes[n], sp_pipes[n], sp_fans[n]],
+    centernodes=[nf_sp_pipes[n], sp_fans[n]],
     edges=[
-      g.edge(chsel_pipes[n], nf_pipes[n], 0, 0),
-      g.edge(nf_pipes[n], sp_pipes[n], 0, 0),
-      g.edge(sp_pipes[n], sp_fans[n], 0, 0),
+      g.edge(chsel_pipes[n], nf_sp_pipes[n], 0, 0),
+      g.edge(nf_sp_pipes[n], sp_fans[n], 0, 0),
       g.edge(sp_fans[n], dnnroi_pipes[n], 0, 0),
     ],
     iports=chsel_pipes[n].iports,
