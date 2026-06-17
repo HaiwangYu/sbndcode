@@ -50,6 +50,7 @@ function(params, tools, override = {}) {
       dft: wc.tn(tools.dft),
       field_response: wc.tn(tools.field),
       elecresponse: wc.tn(tools.elec_resp),
+      rebase_planes: [], // rebaseline was done in NF using more sophisticated method
       ftoffset: 0.0, // default 0.0
       ctoffset: 1.0*wc.microsecond, // default -8.0
       per_chan_resp: pc.name,
