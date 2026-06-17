@@ -13,82 +13,97 @@ function(tools, outputfile) {
   local magorig = [
     g.pnode({
       type: 'MagnifySink',
-      name: 'magorig%d' % n,
+      name: 'magorig%d' % anode.data.ident,
       data: {
         output_filename: outputfile,
         root_file_mode: 'UPDATE',
-        frames: ['orig%d' % n],
+        frames: ['orig%d' % anode.data.ident],
         trace_has_tag: false,   // traces from source have NO tag
-        anode: wc.tn(tools.anodes[n]),
+        anode: wc.tn(anode),
       },
     }, nin=1, nout=1)
-    for n in std.range(0, nanodes - 1)
+    for anode in tools.anodes
   ],
 
   local magraw = [
     g.pnode({
       type: 'MagnifySink',
-      name: 'magraw%d' % n,
+      name: 'magraw%d' % anode.data.ident,
       data: {
         output_filename: outputfile,
         root_file_mode: 'UPDATE',
-        frames: ['raw%d' % n],
+        frames: ['raw%d' % anode.data.ident],
         trace_has_tag: true,
-        cmmtree: [["noisy", "T_noisy%d"%n],
-                  ["sticky", "T_stky%d"%n],
-                  ["ledge", "T_ldg%d"%n],
-                  ["harmonic", "T_hm%d"%n] ], // maskmap in nf.jsonnet 
-        anode: wc.tn(tools.anodes[n]),
+        cmmtree: [["noisy", "T_noisy%d"%anode.data.ident],
+                  ["sticky", "T_stky%d"%anode.data.ident],
+                  ["ledge", "T_ldg%d"%anode.data.ident],
+                  ["harmonic", "T_hm%d"%anode.data.ident] ], // maskmap in nf.jsonnet 
+        anode: wc.tn(anode),
       },
     }, nin=1, nout=1)
-    for n in std.range(0, nanodes - 1)
+    for anode in tools.anodes
   ],
 
   local magdecon = [
     g.pnode({
       type: 'MagnifySink',
-      name: 'magdecon%d' % n,
+      name: 'magdecon%d' % anode.data.ident,
       data: {
         output_filename: outputfile,
         root_file_mode: 'UPDATE',
-        frames: ['gauss%d' % n, 'wiener%d' % n],
+        frames: ['gauss%d' % anode.data.ident, 'wiener%d' % anode.data.ident],
         trace_has_tag: true,
-        anode: wc.tn(tools.anodes[n]),
+        anode: wc.tn(anode),
       },
     }, nin=1, nout=1)
-    for n in std.range(0, nanodes - 1)
+    for anode in tools.anodes
   ],
 
   local magdebug = [
     g.pnode({
       type: 'MagnifySink',
-      name: 'magdebug%d' % n,
+      name: 'magdebug%d' % anode.data.ident,
       data: {
         output_filename: outputfile,
         root_file_mode: 'UPDATE',
-        frames: ['tight_lf%d' %n, 'loose_lf%d' %n, 'cleanup_roi%d' %n,
-                 'break_roi_1st%d' %n, 'break_roi_2nd%d' %n,
-                 'shrink_roi%d' %n, 'extend_roi%d' %n],
+        frames: ['tight_lf%d' %anode.data.ident, 'loose_lf%d' %anode.data.ident, 'cleanup_roi%d' %anode.data.ident,
+                 'break_roi_1st%d' %anode.data.ident, 'break_roi_2nd%d' %anode.data.ident, 'decon_charge%d' %anode.data.ident,
+                 'shrink_roi%d' %anode.data.ident, 'extend_roi%d' %anode.data.ident, 'mp2_roi%d' %anode.data.ident, 'mp3_roi%d' %anode.data.ident],
         trace_has_tag: true,
-        anode: wc.tn(tools.anodes[n]),
+        anode: wc.tn(anode),
       },
     }, nin=1, nout=1)
-    for n in std.range(0, nanodes - 1)
+    for anode in tools.anodes
   ],
 
   local magthr = [
     g.pnode({
       type: 'MagnifySink',
-      name: 'magthr%d' % n,
+      name: 'magthr%d' % anode.data.ident,
       data: {
         output_filename: outputfile,
         root_file_mode: 'UPDATE',
-        summaries: ['wiener%d' % n],  // note that if tag set, each apa should have a tag set for FrameFanin
-        summary_operator: { ['wiener%d' % n]: 'set' },  // []: obj comprehension
-        anode: wc.tn(tools.anodes[n]),
+        summaries: ['wiener%d' % anode.data.ident],  // note that if tag set, each apa should have a tag set for FrameFanin
+        summary_operator: { ['wiener%d' % anode.data.ident]: 'set' },  // []: obj comprehension
+        anode: wc.tn(anode),
       },
     }, nin=1, nout=1)
-    for n in std.range(0, nanodes - 1)
+    for anode in tools.anodes
+  ],
+
+  local magdnnroi = [
+    g.pnode({
+      type: 'MagnifySink',
+      name: 'magdnnroi%d' % anode.data.ident,
+      data: {
+        output_filename: outputfile,
+        root_file_mode: 'UPDATE',
+        frames: ['dnnsp%d' %anode.data.ident],
+        trace_has_tag: true,
+        anode: wc.tn(anode),
+      },
+    }, nin=1, nout=1)
+    for anode in tools.anodes
   ],
 
 
@@ -98,6 +113,7 @@ function(tools, outputfile) {
     decon_pipe: [g.pipeline([magdecon[n]], name='magdeconpipe%d' % n) for n in std.range(0, nanodes - 1)],
     debug_pipe: [g.pipeline([magdebug[n]], name='magdebugpipe%d' % n) for n in std.range(0, nanodes - 1)],
     threshold_pipe: [g.pipeline([magthr[n]], name='magthrpipe%d' % n) for n in std.range(0, nanodes - 1)],
+    dnnroi_pipe: [g.pipeline([magdnnroi[n]], name='magdnnroipipe%d' % n) for n in std.range(0, nanodes - 1)],
   },
 
 
