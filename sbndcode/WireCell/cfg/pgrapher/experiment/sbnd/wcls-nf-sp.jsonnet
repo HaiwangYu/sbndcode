@@ -174,7 +174,16 @@ local sp_override = if use_dnnroi then {
 } else {
     sparse: true,
 };
-local sp = sp_maker(params, tools, { sparse: sigoutform == 'sparse' });
+// sp.jsonnet defaults to the LOW tight-ROI thresholds, which is what every
+// other SBND path asks for.  This one is the exception: sbnd_wcls_sp in
+// wcsimsp_sbnd.fcl sets enableLowROIThresholds "false", so ask for the high
+// values explicitly.  The switch used to be an extVar read inside sp.jsonnet;
+// it moved here so that file stays usable outside art/wcls.
+local sp = sp_maker(params, tools, {
+    sparse: sigoutform == 'sparse',
+    troi_col_th_factor: 5.0,
+    troi_ind_th_factor: 3.0,
+});
 local sp_pipes = [sp.make_sigproc(a) for a in tools.anodes];
 
 local dnnroi = import 'dnnroi.jsonnet';
